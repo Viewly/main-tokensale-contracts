@@ -1,0 +1,12 @@
+{
+  "name": "viewly-main-tokensale-contracts",
+  "private": true,
+  "author": "Viewly Team",
+  "version": "1.0.0",
+  "description": "Smart contracts for Viewly main tokensale",
+  "main": "truffle.js",
+  "scripts": {
+    "test": "truffle test"
+  },
+  "dependencies": {}
+}
