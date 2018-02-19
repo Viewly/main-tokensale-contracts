@@ -20,6 +20,12 @@ function mineOneBlock(web3) {
   });
 }
 
+async function assertTxSuccess(promise) {
+  const receipt = await promise;
+
+  assert.equal(receipt.receipt.status, 1, "Transaction did not succeed");
+};
+
 async function assertTxFail(promise) {
   try {
     await promise;
@@ -51,6 +57,7 @@ module.exports = {
   getBalance,
   currentBlock,
   mineBlocks,
+  assertTxSuccess,
   assertTxFail,
   assertLastEvent,
 }
