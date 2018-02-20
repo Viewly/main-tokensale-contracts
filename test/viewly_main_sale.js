@@ -223,4 +223,16 @@ contract("ViewlyMainSale", (accounts) => {
       await assertTxFail(sale.setWhitelistRequired(true, { from: alex }));
     });
   });
+
+  describe(".setOwner", async() => {
+    it("doesnt allow changing of owner", async () => {
+      await assertTxFail(sale.setOwner(sara, { from: owner }));
+    });
+  });
+
+  describe(".setAuthority", async() => {
+    it("doesnt allow changing of authority", async () => {
+      await assertTxFail(sale.setAuthority(sara, { from: owner }));
+    });
+  });
 });

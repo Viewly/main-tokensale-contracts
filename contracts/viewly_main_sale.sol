@@ -123,6 +123,13 @@ contract ViewlyMainSale is DSAuth, DSMath {
         whitelistRequired = setting;
     }
 
+    function setOwner(address owner_) public auth {
+        revert();
+    }
+
+    function setAuthority(DSAuthority authority_) public auth {
+        revert();
+    }
 
     // PRIVATE
 
