@@ -5,6 +5,7 @@ pragma solidity ^0.4.18;
 
 import "./dappsys/math.sol";
 import "./dappsys/auth.sol";
+import "./dappsys/erc20.sol";
 
 /* Viewly main token sale contract, where contributors send ethers in order to
  * later receive VIEW tokens (outside of this contract).
@@ -130,6 +131,12 @@ contract ViewlyMainSale is DSAuth, DSMath {
     function setAuthority(DSAuthority authority_) public auth {
         revert();
     }
+
+    function recoverTokens(address token_) public auth {
+        ERC20 token = ERC20(token_);
+        token.transfer(beneficiary, token.balanceOf(this));
+    }
+
 
     // PRIVATE
 
