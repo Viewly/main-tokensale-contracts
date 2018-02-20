@@ -25,6 +25,9 @@ contract ViewlyMainSale is DSAuth, DSMath {
     mapping(address => uint256) public contributions;
     mapping(address => uint256) public refunds;
 
+    bool public whitelistRequired;
+    mapping(address => bool) public whitelist;
+
 
     // EVENTS
 
@@ -41,6 +44,10 @@ contract ViewlyMainSale is DSAuth, DSMath {
         _;
     }
 
+    modifier requireWhitelist() {
+        if (whitelistRequired) require(whitelist[msg.sender]);
+        _;
+    }
 
 
     // PUBLIC
@@ -49,7 +56,7 @@ contract ViewlyMainSale is DSAuth, DSMath {
         beneficiary = beneficiary_;
     }
 
-    function() public payable saleOpen {
+    function() public payable {
         contribute();
     }
 
@@ -96,10 +103,30 @@ contract ViewlyMainSale is DSAuth, DSMath {
         LogCollectAmount(amount);
     }
 
+    function addToWhitelist(address[] contributors) public auth {
+        require(contributors.length != 0);
+
+        for (uint i = 0; i < contributors.length; i++) {
+          whitelist[contributors[i]] = true;
+        }
+    }
+
+    function removeFromWhitelist(address[] contributors) public auth {
+        require(contributors.length != 0);
+
+        for (uint i = 0; i < contributors.length; i++) {
+          whitelist[contributors[i]] = false;
+        }
+    }
+
+    function setWhitelistRequired(bool setting) public auth {
+        whitelistRequired = setting;
+    }
+
 
     // PRIVATE
 
-    function contribute() private {
+    function contribute() private saleOpen requireWhitelist {
         require(msg.value >= minContributionAmount);
         require(maxTotalAmount >= add(totalContributedAmount, msg.value));
 

@@ -1,6 +1,7 @@
 const ViewlyMainSale = artifacts.require("ViewlyMainSale")
 const {
-  currentBlock, getBalance, mineBlocks, assertTxFail, assertLastEvent
+  currentBlock, getBalance, mineBlocks,
+  assertTxSuccess, assertTxFail, assertLastEvent
 } = require('./test_helpers');
 
 
@@ -179,15 +180,47 @@ contract("ViewlyMainSale", (accounts) => {
     });
   });
 
-  //describe("addToWhitelist", async() => {
-    //it("should add contributor with expected contribution amount to whitelist", async () => {
-      //const contributor = accounts[1];
-      //const amount = web3.toWei(1, "ether");
+  describe(".addToWhitelist", async() => {
+    it("adds contributors to whitelist", async () => {
+      await sale.addToWhitelist([charlie, sara]);
 
-      //await sale.addToWhitelist([contributor], [amount], {from: owner});
+      assert.equal((await sale.whitelist.call(charlie)), true)
+      assert.equal((await sale.whitelist.call(sara)), true);
+      assert.equal((await sale.whitelist.call(alex)), false);
+    });
 
-      //assert.equal((await sale.whitelist.call(contributor)), amount, "Not in the whitelist");
-    //});
-  //});
+    it("fails when not called by the owner", async () => {
+      await assertTxFail(sale.addToWhitelist([charlie], { from: charlie }));
+    });
+  });
 
+  describe(".removeFromWhitelist", async() => {
+    it("removes contributors from whitelist", async () => {
+      await sale.addToWhitelist([charlie, sara, alex]);
+      await sale.removeFromWhitelist([charlie, sara]);
+
+      assert.equal((await sale.whitelist.call(charlie)), false);
+      assert.equal((await sale.whitelist.call(sara)), false);
+      assert.equal((await sale.whitelist.call(alex)), true);
+    });
+
+    it("fails when not called by the owner", async () => {
+      await assertTxFail(sale.removeFromWhitelist([charlie], { from: charlie }));
+    });
+  });
+
+  describe(".setWhitelistRequired", async() => {
+    it("sets whitelist required flag", async () => {
+      await sale.setWhitelistRequired(true);
+      await sale.addToWhitelist([sara]);
+
+      assert.equal(await sale.whitelistRequired.call(), true);
+      await assertTxSuccess(sale.sendTransaction({ from: sara, value: web3.toWei(1, "ether") }));
+      await assertTxFail(sale.sendTransaction({ from: charlie, value: web3.toWei(1, "ether") }));
+    });
+
+    it("fails when not called by the owner", async () => {
+      await assertTxFail(sale.setWhitelistRequired(true, { from: alex }));
+    });
+  });
 });
