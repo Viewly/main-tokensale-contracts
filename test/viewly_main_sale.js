@@ -2,7 +2,7 @@ const ViewlyMainSale = artifacts.require("ViewlyMainSale")
 const {
   currentBlock, getBalance, mineBlocks,
   assertTxSuccess, assertTxFail, assertLastEvent
-} = require('./test_helpers');
+} = require("./test_helpers");
 
 
 contract("ViewlyMainSale", (accounts) => {
@@ -100,9 +100,11 @@ contract("ViewlyMainSale", (accounts) => {
       });
     });
 
-    //it("fails when refund amount exeeds total balance", async () => {
-      //await assertTxFail(sale.refund(charlie, { from: charlie }));
-    //});
+    it("fails when refund amount exeeds total balance", async () => {
+      await sale.collectAmount(web3.toWei(2, "ether"));
+
+      await assertTxFail(sale.refund(charlie, { from: charlie }));
+    });
 
     it("fails when not called by the owner", async () => {
       await assertTxFail(sale.refund(charlie, { from: charlie }));
